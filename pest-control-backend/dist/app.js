@@ -7,7 +7,6 @@ exports.createApp = void 0;
 const express_1 = __importDefault(require("express"));
 // import helmet from 'helmet';
 const cors_1 = __importDefault(require("cors"));
-const logger_1 = __importDefault(require("./config/logger"));
 const index_1 = require("./routes/index");
 const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
 const notFoundHandler_1 = require("./middlewares/notFoundHandler");
@@ -23,15 +22,9 @@ const createApp = () => {
     }));
     app.use(express_1.default.json({ limit: '1mb' }));
     app.use(express_1.default.urlencoded({ extended: true }));
-    // Log all incoming requests with full details
+    // Log all incoming requests with full details to stderr (so cPanel logs it)
     app.use((req, _res, next) => {
-        logger_1.default.info({
-            method: req.method,
-            url: req.url,
-            originalUrl: req.originalUrl,
-            baseUrl: req.baseUrl,
-            path: req.path
-        }, `[Request Debug Log] ${req.method} ${req.url}`);
+        console.error(`[Request Debug Log] METHOD: ${req.method} | URL: ${req.url} | ORIGINAL: ${req.originalUrl} | BASE: ${req.baseUrl} | PATH: ${req.path}`);
         next();
     });
     // Normal routes (local dev)

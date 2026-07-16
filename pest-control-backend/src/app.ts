@@ -21,15 +21,9 @@ export const createApp = () => {
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true }));
 
-  // Log all incoming requests with full details
+  // Log all incoming requests with full details to stderr (so cPanel logs it)
   app.use((req, _res, next) => {
-    logger.info({
-      method: req.method,
-      url: req.url,
-      originalUrl: req.originalUrl,
-      baseUrl: req.baseUrl,
-      path: req.path
-    }, `[Request Debug Log] ${req.method} ${req.url}`);
+    console.error(`[Request Debug Log] METHOD: ${req.method} | URL: ${req.url} | ORIGINAL: ${req.originalUrl} | BASE: ${req.baseUrl} | PATH: ${req.path}`);
     next();
   });
 
