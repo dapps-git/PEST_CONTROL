@@ -10,11 +10,13 @@ const isTest = env === 'test';
 if (!isTest) {
     dotenv_1.default.config({ path: path_1.default.join(__dirname, '../../.env') });
 }
+const rawPort = process.env.PORT ?? '4000';
+const port = /^\d+$/.test(rawPort) ? Number.parseInt(rawPort, 10) : rawPort;
 const config = {
     env,
     isDev: env === 'development',
     isProd: env === 'production',
-    port: Number.parseInt(process.env.PORT ?? '4000', 10),
+    port,
     logLevel: process.env.LOG_LEVEL ?? 'info'
 };
 exports.default = config;
