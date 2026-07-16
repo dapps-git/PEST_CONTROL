@@ -1,6 +1,7 @@
 import express from 'express';
 // import helmet from 'helmet';
 import cors from 'cors';
+import logger from './config/logger';
 import { rootRouter } from './routes/index';
 import adminRouter from './routes/admin.routes';
 import { notFoundHandler } from './middlewares/notFoundHandler';
@@ -20,9 +21,15 @@ export const createApp = () => {
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true }));
 
-  // Log all incoming requests
+  // Log all incoming requests with full details
   app.use((req, _res, next) => {
-    console.error(`[Request Log] ${req.method} ${req.url}`);
+    logger.info({
+      method: req.method,
+      url: req.url,
+      originalUrl: req.originalUrl,
+      baseUrl: req.baseUrl,
+      path: req.path
+    }, `[Request Debug Log] ${req.method} ${req.url}`);
     next();
   });
 
