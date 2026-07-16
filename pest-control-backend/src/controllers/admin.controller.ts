@@ -3,7 +3,7 @@ import { DocumentModel } from "../model/document.model";
 import { AuthService } from "../services/auth.service";
 import { AdminModel } from "../model/admin.model";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const FILE_LABELS = ["Q1", "Q2", "Q3", "Q4", "S1", "Board", "Year"];
 

@@ -8,7 +8,7 @@ const document_model_1 = require("../model/document.model");
 const auth_service_1 = require("../services/auth.service");
 const admin_model_1 = require("../model/admin.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const FILE_LABELS = ["Q1", "Q2", "Q3", "Q4", "S1", "Board", "Year"];
 // POST /admin/login
 const adminLogin = async (req, res) => {
@@ -35,7 +35,7 @@ const verifyPassword = async (req, res) => {
         console.log("[verifyPassword] Failed: Admin not found for email:", userEmail);
         return res.status(404).json({ success: false, message: "Admin not found" });
     }
-    const match = await bcrypt_1.default.compare(password, admin.passwordHash);
+    const match = await bcryptjs_1.default.compare(password, admin.passwordHash);
     console.log("[verifyPassword] Bcrypt comparison result for email:", userEmail, "match:", match);
     return res.json({ success: true, isValid: match });
 };
@@ -51,12 +51,12 @@ const changePassword = async (req, res) => {
     if (!admin) {
         return res.status(404).json({ success: false, message: "Admin not found" });
     }
-    const match = await bcrypt_1.default.compare(oldPassword, admin.passwordHash);
+    const match = await bcryptjs_1.default.compare(oldPassword, admin.passwordHash);
     if (!match) {
         return res.status(400).json({ success: false, message: "Incorrect old password." });
     }
-    const salt = await bcrypt_1.default.genSalt(10);
-    const passwordHash = await bcrypt_1.default.hash(newPassword, salt);
+    const salt = await bcryptjs_1.default.genSalt(10);
+    const passwordHash = await bcryptjs_1.default.hash(newPassword, salt);
     admin.passwordHash = passwordHash;
     await admin.save();
     return res.json({ success: true, message: "Password updated successfully." });

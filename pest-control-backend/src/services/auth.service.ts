@@ -1,5 +1,5 @@
 import { AppError } from "../utils/AppError";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { AdminModel } from "../model/admin.model";
 
 export class AuthService {
