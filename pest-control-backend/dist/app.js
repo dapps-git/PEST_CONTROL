@@ -23,7 +23,7 @@ const createApp = () => {
     app.use(express_1.default.json({ limit: '1mb' }));
     app.use(express_1.default.urlencoded({ extended: true }));
     app.use((req, res, next) => {
-        console.log(`[Request] ${req.method} ${req.url}`);
+        console.error(`[Request Log] ${req.method} ${req.url}`);
         next();
     });
     app.use('/admin', admin_routes_1.default);
