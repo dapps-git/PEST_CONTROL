@@ -22,17 +22,19 @@ const createApp = () => {
     }));
     app.use(express_1.default.json({ limit: '1mb' }));
     app.use(express_1.default.urlencoded({ extended: true }));
-    // Strip /pestcontrol subdirectory prefix added by Passenger on Namecheap
+    // Log all incoming requests
     app.use((req, _res, next) => {
-        if (req.url.startsWith('/pestcontrol')) {
-            req.url = req.url.slice('/pestcontrol'.length) || '/';
-        }
         console.error(`[Request Log] ${req.method} ${req.url}`);
         next();
     });
+    // Normal routes (local dev)
     app.use('/admin', admin_routes_1.default);
     app.use('/api/admin', admin_routes_1.default);
     app.use('/api', index_1.rootRouter);
+    // Namecheap Passenger routes (with /pestcontrol subdirectory prefix)
+    app.use('/pestcontrol/admin', admin_routes_1.default);
+    app.use('/pestcontrol/api/admin', admin_routes_1.default);
+    app.use('/pestcontrol/api', index_1.rootRouter);
     app.use(notFoundHandler_1.notFoundHandler);
     app.use(errorHandler_1.errorHandler);
     return app;
