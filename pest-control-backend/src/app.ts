@@ -36,21 +36,6 @@ export const createApp = () => {
   app.use('/pestcontrol/api/admin', adminRouter);
   app.use('/pestcontrol/api', rootRouter);
 
-  // Log all registered routes for debugging
-  console.log("=== Registered Express Routes ===");
-  app._router.stack.forEach((middleware: any) => {
-    if (middleware.route) { // routes registered directly on the app
-      console.log(`Route: ${Object.keys(middleware.route.methods).join(',').toUpperCase()} ${middleware.route.path}`);
-    } else if (middleware.name === 'router') { // router middleware
-      middleware.handle.stack.forEach((handler: any) => {
-        if (handler.route) {
-          console.log(`Route: ${Object.keys(handler.route.methods).join(',').toUpperCase()} ${middleware.regexp} ${handler.route.path}`);
-        }
-      });
-    }
-  });
-  console.log("=================================");
-
   app.use(notFoundHandler);
   app.use(errorHandler);
 
