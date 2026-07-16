@@ -93,13 +93,15 @@ export const addDocument = async (req: Request, res: Response) => {
     const fileArr = uploadedFiles?.[key];
     if (fileArr && fileArr.length > 0) {
       const f = fileArr[0];
-      files.push({
-        label,
-        date: req.body[`date${index}`] || "",
-        year: req.body[`year${index}`] || "",
-        fileData: f.buffer,
-        contentType: f.mimetype,
-      });
+      if (f) {
+        files.push({
+          label,
+          date: req.body[`date${index}`] || "",
+          year: req.body[`year${index}`] || "",
+          fileData: f.buffer,
+          contentType: f.mimetype,
+        });
+      }
     }
   });
 

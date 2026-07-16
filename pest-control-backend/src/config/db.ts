@@ -15,7 +15,7 @@ const seedAdmin = async () => {
       logger.info(`✅ Admin user seeded in database: ${email}`);
     }
   } catch (error) {
-    logger.error("Failed to seed admin user:", error);
+    logger.error(error as Error, "Failed to seed admin user");
   }
 };
 
