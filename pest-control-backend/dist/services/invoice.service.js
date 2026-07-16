@@ -1,0 +1,38 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InvoiceService = void 0;
+const invoice_model_1 = require("../model/invoice.model");
+class InvoiceService {
+    async create(data) {
+        const invoice = await invoice_model_1.Invoice.create(data);
+        return invoice;
+    }
+    async list(filters = {}) {
+        const { contractId, jobId, startDate, endDate } = filters;
+        const query = {};
+        if (contractId)
+            query.contractId = contractId;
+        if (jobId)
+            query.jobId = jobId;
+        if (startDate && endDate) {
+            query.collectionDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
+        }
+        if (filters.scheduledStartDate && filters.scheduledEndDate) {
+            query.scheduledDate = { $gte: new Date(filters.scheduledStartDate), $lte: new Date(filters.scheduledEndDate) };
+        }
+        return await invoice_model_1.Invoice.find(query).sort({ collectionDate: -1 });
+    }
+    async getByScheduledDate(contractId, jobId, scheduledDate) {
+        const start = new Date(scheduledDate);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(scheduledDate);
+        end.setHours(23, 59, 59, 999);
+        return await invoice_model_1.Invoice.findOne({
+            contractId,
+            jobId,
+            scheduledDate: { $gte: start, $lte: end }
+        });
+    }
+}
+exports.InvoiceService = InvoiceService;
+//# sourceMappingURL=invoice.service.js.map

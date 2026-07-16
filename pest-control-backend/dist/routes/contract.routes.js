@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.contractRouter = void 0;
+const express_1 = require("express");
+const contract_controller_1 = require("../controllers/contract.controller");
+const asyncHandler_1 = require("../utils/asyncHandler");
+const auth_1 = require("../middlewares/auth");
+const router = (0, express_1.Router)();
+exports.contractRouter = router;
+router.post("/", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.createContract));
+router.get("/", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.listContracts));
+router.get("/stats", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.getDashboardStats));
+router.get("/:id", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.getContractById));
+router.patch("/:id", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.updateContract));
+router.delete("/:id", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.deleteContract));
+router.post("/:id/jobs", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.addJobToContract));
+router.get("/:id/jobs/:jobId", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.getJobById));
+router.patch("/:id/jobs/:jobId", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.updateJob));
+router.delete("/:id/jobs/:jobId", auth_1.protectRoute, (0, asyncHandler_1.asyncHandler)(contract_controller_1.deleteJob));
+//# sourceMappingURL=contract.routes.js.map
