@@ -1,0 +1,125 @@
+/* Container & Fonts */
+.rbc-calendar {
+  font-family: inherit; /* Inherits Montserrat/Sans */
+  color: #334155; /* Slate-700 */
+}
+
+/* Header */
+.rbc-header {
+  padding: 16px 8px;
+  font-weight: 600;
+  color: #64748b; /* Slate-500 */
+  border-bottom: 1px solid #f1f5f9; /* Slate-100 */
+  background-color: #ffffff;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-left: none !important;
+}
+
+/* Month View Grid */
+.rbc-month-view {
+  border: 1px solid #f1f5f9;
+  border-radius: 0 0 16px 16px;
+}
+
+.rbc-month-row {
+  border-top: 1px solid #f1f5f9;
+  min-height: 120px; /* Taller cells */
+}
+
+.rbc-day-bg {
+  border-left: 1px solid #f8fafc; /* Very subtle vertical lines */
+}
+
+.rbc-off-range-bg {
+  background-color: #f8fafc; /* Slate-50 */
+}
+
+/* Date Numbers */
+.rbc-date-cell {
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.rbc-now {
+  font-weight: 700;
+  color: #4f46e5; /* Indigo-600 */
+}
+
+/* Today Highlight */
+.rbc-day-bg.rbc-today {
+  background-color: #eef2ff !important; /* Indigo-50 */
+}
+
+/* Event Styling Overrides */
+.rbc-event {
+  border: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  margin-bottom: 4px;
+  padding: 2px 5px !important;
+  transition: transform 0.1s ease;
+}
+
+.rbc-event:hover {
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.rbc-event-content {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+/* Show More Link */
+.rbc-show-more {
+  background-color: white;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.rbc-show-more:hover {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+/* Time Views (Week/Day) */
+.rbc-time-view {
+  border: 1px solid #f1f5f9;
+  border-radius: 0 0 16px 16px;
+}
+
+.rbc-time-header {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.rbc-time-content {
+  border-top: 1px solid #f1f5f9;
+}
+
+.rbc-timeslot-group {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.rbc-time-gutter .rbc-timeslot-group {
+  border-right: 1px solid #f1f5f9;
+  background-color: #ffffff;
+}
+
+.rbc-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Current Time Indicator */
+.rbc-current-time-indicator {
+  background-color: #ef4444; /* Red-500 */
+}
