@@ -17,12 +17,16 @@ const createApp = () => {
     app.set('trust proxy', 1);
     // app.use(helmet());
     app.use((0, cors_1.default)({
-        origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176', 'http://localhost:4000'],
+        origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176', 'http://localhost:4000', 'http://tweaki.pw', 'https://tweaki.pw'],
         credentials: true,
     }));
     app.use(express_1.default.json({ limit: '1mb' }));
     app.use(express_1.default.urlencoded({ extended: true }));
-    app.use((req, res, next) => {
+    // Strip /pestcontrol subdirectory prefix added by Passenger on Namecheap
+    app.use((req, _res, next) => {
+        if (req.url.startsWith('/pestcontrol')) {
+            req.url = req.url.slice('/pestcontrol'.length) || '/';
+        }
         console.error(`[Request Log] ${req.method} ${req.url}`);
         next();
     });
