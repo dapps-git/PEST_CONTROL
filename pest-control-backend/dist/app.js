@@ -16,7 +16,7 @@ const createApp = () => {
     app.disable('x-powered-by');
     app.set('trust proxy', 1);
     // app.use(helmet());
-    app.use((0, cors_1.default)({
+    const corsOptions = {
         origin: (origin, callback) => {
             if (!origin)
                 return callback(null, true);
@@ -27,17 +27,32 @@ const createApp = () => {
                 'http://localhost:5176',
                 'http://localhost:4000',
                 'http://tweaki.pw',
-                'https://tweaki.pw'
+                'https://tweaki.pw',
+                'https://pest-control-flame.vercel.app'
             ];
             if (allowed.includes(origin) || origin.endsWith('.vercel.app')) {
-                callback(null, true);
+                return callback(null, true);
             }
-            else {
-                callback(new Error('Not allowed by CORS'));
-            }
+            return callback(new Error('Not allowed by CORS'));
         },
         credentials: true,
-    }));
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: [
+            'Authorization',
+            'authorization',
+            'Content-Type',
+            'content-type',
+            'Origin',
+            'Accept',
+            'X-Requested-With',
+            'Access-Control-Allow-Headers',
+            'Access-Control-Request-Method',
+            'Access-Control-Request-Headers'
+        ],
+        optionsSuccessStatus: 200
+    };
+    app.use((0, cors_1.default)(corsOptions));
+    app.options('*', (0, cors_1.default)(corsOptions));
     app.use(express_1.default.json({ limit: '1mb' }));
     app.use(express_1.default.urlencoded({ extended: true }));
     // Log all incoming requests with full details to stderr (so cPanel logs it)

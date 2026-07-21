@@ -1,0 +1,14 @@
+# Pass Authorization Header & Handle Preflight for Node.js / Phusion Passenger on Namecheap cPanel
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Pass Authorization header to Node.js backend
+  RewriteCond %{HTTP:Authorization} ^(.*)
+  RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Credentials "true"
+  Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  Header always set Access-Control-Allow-Headers "Authorization, authorization, Content-Type, content-type, Origin, Accept, X-Requested-With, Access-Control-Allow-Headers, Access-Control-Request-Method, Access-Control-Request-Headers"
+</IfModule>
