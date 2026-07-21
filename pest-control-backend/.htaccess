@@ -5,9 +5,14 @@
   # Pass Authorization header to Node.js backend
   RewriteCond %{HTTP:Authorization} ^(.*)
   RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+
+  # Respond HTTP 200 OK immediately for OPTIONS preflight requests if needed
+  RewriteCond %{REQUEST_METHOD} OPTIONS
+  RewriteRule ^(.*)$ $1 [R=200,L]
 </IfModule>
 
 <IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "%{HTTP_ORIGIN}e" env=HTTP_ORIGIN
   Header always set Access-Control-Allow-Credentials "true"
   Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
   Header always set Access-Control-Allow-Headers "Authorization, authorization, Content-Type, content-type, Origin, Accept, X-Requested-With, Access-Control-Allow-Headers, Access-Control-Request-Method, Access-Control-Request-Headers"

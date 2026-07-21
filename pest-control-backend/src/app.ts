@@ -15,23 +15,7 @@ export const createApp = () => {
 
   // app.use(helmet());
   const corsOptions: cors.CorsOptions = {
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      const allowed = [
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://localhost:5175',
-        'http://localhost:5176',
-        'http://localhost:4000',
-        'http://tweaki.pw',
-        'https://tweaki.pw',
-        'https://pest-control-flame.vercel.app'
-      ];
-      if (allowed.includes(origin) || origin.endsWith('.vercel.app')) {
-        return callback(null, true);
-      }
-      return callback(new Error('Not allowed by CORS'));
-    },
+    origin: true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -50,7 +34,6 @@ export const createApp = () => {
   };
 
   app.use(cors(corsOptions));
-  app.options('*', cors(corsOptions));
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true }));
 

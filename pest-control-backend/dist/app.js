@@ -17,24 +17,7 @@ const createApp = () => {
     app.set('trust proxy', 1);
     // app.use(helmet());
     const corsOptions = {
-        origin: (origin, callback) => {
-            if (!origin)
-                return callback(null, true);
-            const allowed = [
-                'http://localhost:5173',
-                'http://localhost:5174',
-                'http://localhost:5175',
-                'http://localhost:5176',
-                'http://localhost:4000',
-                'http://tweaki.pw',
-                'https://tweaki.pw',
-                'https://pest-control-flame.vercel.app'
-            ];
-            if (allowed.includes(origin) || origin.endsWith('.vercel.app')) {
-                return callback(null, true);
-            }
-            return callback(new Error('Not allowed by CORS'));
-        },
+        origin: true,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: [
@@ -52,7 +35,6 @@ const createApp = () => {
         optionsSuccessStatus: 200
     };
     app.use((0, cors_1.default)(corsOptions));
-    app.options('*', (0, cors_1.default)(corsOptions));
     app.use(express_1.default.json({ limit: '1mb' }));
     app.use(express_1.default.urlencoded({ extended: true }));
     // Log all incoming requests with full details to stderr (so cPanel logs it)
