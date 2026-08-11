@@ -31,10 +31,20 @@ class InvoiceService {
             query.scheduledDate = { $gte: new Date(filters.scheduledStartDate), $lte: new Date(filters.scheduledEndDate) };
         }
         if (search) {
+            const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const matchingContracts = await contract_model_1.Contract.find({
+                $or: [
+                    { title: { $regex: escapedSearch, $options: "i" } },
+                    { aliasName: { $regex: escapedSearch, $options: "i" } },
+                    { contractNumber: { $regex: escapedSearch, $options: "i" } }
+                ]
+            }).select("_id");
+            const matchingContractIds = matchingContracts.map((c) => c._id);
             query.$or = [
-                { contractNumber: { $regex: search, $options: "i" } },
-                { clientName: { $regex: search, $options: "i" } },
-                { "items.description": { $regex: search, $options: "i" } }
+                { contractNumber: { $regex: escapedSearch, $options: "i" } },
+                { clientName: { $regex: escapedSearch, $options: "i" } },
+                { contractId: { $in: matchingContractIds } },
+                { "items.description": { $regex: escapedSearch, $options: "i" } }
             ];
         }
         const invoices = await invoice_model_1.Invoice.find(query)

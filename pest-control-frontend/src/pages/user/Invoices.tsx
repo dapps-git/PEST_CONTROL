@@ -419,22 +419,68 @@ export default function Invoices() {
                     ) : (
                         // COLLECTED TAB
                         <div className="space-y-6">
-                            {invoicesLoading ? (
-                                <div className="flex flex-col items-center justify-center py-20">
-                                    <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-                                    <p className="text-slate-500 font-medium">Loading collected invoices...</p>
-                                </div>
-                            ) : collectedInvoices.length === 0 ? (
-                                <div className="bg-white rounded-2xl p-16 text-center border border-dashed border-slate-300">
-                                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Receipt className="w-8 h-8 text-slate-400" />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-slate-900">No Collected Invoices</h3>
-                                    <p className="text-slate-500 mt-1 max-w-sm mx-auto">Collected invoices from the calendar will appear here.</p>
-                                </div>
-                            ) : (
-                                <div className="grid gap-6">
-                                    {collectedInvoices.map((invoice: any) => {
+                            {(() => {
+                                const filteredCollectedInvoices = collectedInvoices.filter((invoice: any) => {
+                                    if (!searchTerm) return true;
+                                    const searchLower = searchTerm.toLowerCase();
+                                    const foundContract = contracts.find(
+                                        (c) =>
+                                            c._id === (typeof invoice.contractId === "object" ? invoice.contractId?._id : invoice.contractId) ||
+                                            (invoice.contractNumber && c.contractNumber === invoice.contractNumber)
+                                    );
+                                    const clientName = (
+                                        invoice.clientName ||
+                                        (typeof invoice.contractId === "object" ? invoice.contractId?.title : null) ||
+                                        foundContract?.title ||
+                                        ""
+                                    ).toLowerCase();
+                                    const contractNum = (
+                                        invoice.contractNumber ||
+                                        (typeof invoice.contractId === "object" ? invoice.contractId?.contractNumber : "") ||
+                                        foundContract?.contractNumber ||
+                                        ""
+                                    ).toLowerCase();
+                                    const invoiceId = (invoice._id || "").toLowerCase();
+                                    const itemMatch = invoice.items?.some((i: any) => (i.description || "").toLowerCase().includes(searchLower));
+
+                                    return (
+                                        clientName.includes(searchLower) ||
+                                        contractNum.includes(searchLower) ||
+                                        invoiceId.includes(searchLower) ||
+                                        itemMatch
+                                    );
+                                });
+
+                                if (invoicesLoading) {
+                                    return (
+                                        <div className="flex flex-col items-center justify-center py-20">
+                                            <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+                                            <p className="text-slate-500 font-medium">Loading collected invoices...</p>
+                                        </div>
+                                    );
+                                }
+
+                                if (filteredCollectedInvoices.length === 0) {
+                                    return (
+                                        <div className="bg-white rounded-2xl p-16 text-center border border-dashed border-slate-300">
+                                            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <Receipt className="w-8 h-8 text-slate-400" />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-slate-900">
+                                                {searchTerm ? "No Matching Invoices Found" : "No Collected Invoices"}
+                                            </h3>
+                                            <p className="text-slate-500 mt-1 max-w-sm mx-auto">
+                                                {searchTerm
+                                                    ? `No collected invoices found matching "${searchTerm}".`
+                                                    : "Collected invoices from the calendar will appear here."}
+                                            </p>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <div className="grid gap-6">
+                                        {filteredCollectedInvoices.map((invoice: any) => {
                                         const foundContract = contracts.find(
                                             (c) =>
                                                 c._id === (typeof invoice.contractId === "object" ? invoice.contractId?._id : invoice.contractId) ||
@@ -515,7 +561,8 @@ export default function Invoices() {
                                         );
                                     })}
                                 </div>
-                            )}
+                                );
+                            })()}
                         </div>
                     )}
                 </div>

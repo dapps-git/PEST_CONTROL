@@ -13,11 +13,12 @@ class ContractService {
     async list({ page = 1, limit = 10, search = "", startDate = null, endDate = null }) {
         const filter = {};
         if (search) {
+            const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             filter.$or = [
-                { title: { $regex: search, $options: "i" } },
-                { aliasName: { $regex: search, $options: "i" } },
-                { trnNumber: { $regex: search, $options: "i" } },
-                { contractNumber: { $regex: search, $options: "i" } },
+                { title: { $regex: escapedSearch, $options: "i" } },
+                { aliasName: { $regex: escapedSearch, $options: "i" } },
+                { trnNumber: { $regex: escapedSearch, $options: "i" } },
+                { contractNumber: { $regex: escapedSearch, $options: "i" } },
             ];
         }
         if (startDate && endDate) {

@@ -30,10 +30,22 @@ export class InvoiceService {
         }
 
         if (search) {
+            const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const matchingContracts = await Contract.find({
+                $or: [
+                    { title: { $regex: escapedSearch, $options: "i" } },
+                    { aliasName: { $regex: escapedSearch, $options: "i" } },
+                    { contractNumber: { $regex: escapedSearch, $options: "i" } }
+                ]
+            }).select("_id");
+
+            const matchingContractIds = matchingContracts.map((c: any) => c._id);
+
             query.$or = [
-                { contractNumber: { $regex: search, $options: "i" } },
-                { clientName: { $regex: search, $options: "i" } },
-                { "items.description": { $regex: search, $options: "i" } }
+                { contractNumber: { $regex: escapedSearch, $options: "i" } },
+                { clientName: { $regex: escapedSearch, $options: "i" } },
+                { contractId: { $in: matchingContractIds } },
+                { "items.description": { $regex: escapedSearch, $options: "i" } }
             ];
         }
 
