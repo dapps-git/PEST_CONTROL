@@ -8,7 +8,7 @@ class InvoiceService {
         return invoice;
     }
     async list(filters = {}) {
-        const { contractId, jobId, startDate, endDate } = filters;
+        const { contractId, jobId, startDate, endDate, search } = filters;
         const query = {};
         if (contractId)
             query.contractId = contractId;
@@ -20,7 +20,16 @@ class InvoiceService {
         if (filters.scheduledStartDate && filters.scheduledEndDate) {
             query.scheduledDate = { $gte: new Date(filters.scheduledStartDate), $lte: new Date(filters.scheduledEndDate) };
         }
-        return await invoice_model_1.Invoice.find(query).sort({ collectionDate: -1 });
+        if (search) {
+            query.$or = [
+                { contractNumber: { $regex: search, $options: "i" } },
+                { clientName: { $regex: search, $options: "i" } },
+                { "items.description": { $regex: search, $options: "i" } }
+            ];
+        }
+        return await invoice_model_1.Invoice.find(query)
+            .populate("contractId", "title contractNumber email phone")
+            .sort({ collectionDate: -1 });
     }
     async getByScheduledDate(contractId, jobId, scheduledDate) {
         const start = new Date(scheduledDate);

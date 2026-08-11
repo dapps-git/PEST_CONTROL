@@ -2,6 +2,7 @@ import { z } from "zod";
 export declare const createContractSchema: z.ZodObject<{
     body: z.ZodObject<{
         title: z.ZodString;
+        contractDate: z.ZodOptional<z.ZodString>;
         aliasName: z.ZodString;
         trnNumber: z.ZodString;
         email: z.ZodString;
@@ -39,6 +40,7 @@ export declare const createContractSchema: z.ZodObject<{
 export declare const updateContractSchema: z.ZodObject<{
     body: z.ZodObject<{
         title: z.ZodOptional<z.ZodString>;
+        contractDate: z.ZodOptional<z.ZodOptional<z.ZodString>>;
         aliasName: z.ZodOptional<z.ZodString>;
         trnNumber: z.ZodOptional<z.ZodString>;
         email: z.ZodOptional<z.ZodString>;

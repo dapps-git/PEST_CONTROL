@@ -45,6 +45,7 @@ const invoiceSchema = new mongoose_1.Schema({
     contractId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Contract", required: true },
     jobId: { type: mongoose_1.Schema.Types.ObjectId, required: true },
     contractNumber: { type: String },
+    clientName: { type: String },
     scheduledDate: { type: Date, required: true },
     collectionDate: { type: Date, required: true },
     items: { type: [invoiceItemSchema], required: true },

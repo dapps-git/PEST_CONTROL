@@ -11,6 +11,7 @@ export interface InvoiceDocument extends Document {
     contractId: mongoose.Types.ObjectId;
     jobId: mongoose.Types.ObjectId;
     contractNumber: string;
+    clientName?: string;
 
     scheduledDate: Date;
     collectionDate: Date;
@@ -37,6 +38,7 @@ const invoiceSchema = new Schema<InvoiceDocument>(
         contractId: { type: Schema.Types.ObjectId, ref: "Contract", required: true },
         jobId: { type: Schema.Types.ObjectId, required: true },
         contractNumber: { type: String },
+        clientName: { type: String },
 
         scheduledDate: { type: Date, required: true },
         collectionDate: { type: Date, required: true },

@@ -9,6 +9,7 @@ export interface InvoiceDocument extends Document {
     contractId: mongoose.Types.ObjectId;
     jobId: mongoose.Types.ObjectId;
     contractNumber: string;
+    clientName?: string;
     scheduledDate: Date;
     collectionDate: Date;
     items: InvoiceItem[];

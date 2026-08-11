@@ -67,6 +67,7 @@ export interface JobType {
 
 export interface ContractDocument extends Document {
   contractNumber: string;
+  contractDate?: Date;
   title: string;
   aliasName: string;
   trnNumber: string;
@@ -192,6 +193,10 @@ const contractSchema = new Schema<ContractDocument>(
       type: String,
       unique: true,
       immutable: true,
+    },
+    contractDate: {
+      type: Date,
+      default: Date.now,
     },
     title: { type: String },
     aliasName: { type: String },
