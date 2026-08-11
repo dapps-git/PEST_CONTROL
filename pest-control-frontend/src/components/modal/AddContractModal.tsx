@@ -108,7 +108,13 @@ export const AddContractModal = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { _id, contractNumber, createdAt, updatedAt, jobs, __v, ...cleanData } = formData;
+    const cleanData = { ...(formData as any) };
+    delete cleanData._id;
+    delete cleanData.contractNumber;
+    delete cleanData.createdAt;
+    delete cleanData.updatedAt;
+    delete cleanData.jobs;
+    delete cleanData.__v;
 
     const payload = {
       ...cleanData,
