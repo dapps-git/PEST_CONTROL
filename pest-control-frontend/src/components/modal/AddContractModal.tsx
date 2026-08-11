@@ -108,10 +108,13 @@ export const AddContractModal = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const { _id, contractNumber, createdAt, updatedAt, jobs, __v, ...cleanData } = formData;
+
     const payload = {
-      ...formData,
+      ...cleanData,
       quoteValidityDays: Number(formData.quoteValidityDays),
       creditLimit: Number(formData.creditLimit),
+      contractDate: formData.contractDate ? new Date(formData.contractDate).toISOString() : new Date().toISOString(),
     };
 
     onSubmit(payload);
