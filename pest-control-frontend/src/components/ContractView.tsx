@@ -296,6 +296,8 @@ export default function ContractView() {
                   <h2 className="font-bold text-slate-800 text-sm uppercase tracking-wide">Business Info</h2>
                 </div>
                 <div className="p-6 space-y-4">
+                  <SidebarItem label="Contract Date" value={formatDate(contract.contractDate || contract.createdAt!)} />
+                  <div className="h-px bg-slate-100" />
                   <SidebarItem label="Sales Rep" value={contract.referredByEmployee} />
                   <div className="h-px bg-slate-100" />
                   <SidebarItem label="Quote Validity" value={`${contract.quoteValidityDays} Days`} />
