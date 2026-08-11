@@ -5,8 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createApp = void 0;
 const express_1 = __importDefault(require("express"));
-// import helmet from 'helmet';
-const cors_1 = __importDefault(require("cors"));
 const index_1 = require("./routes/index");
 const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
 const notFoundHandler_1 = require("./middlewares/notFoundHandler");
@@ -16,25 +14,24 @@ const createApp = () => {
     app.disable('x-powered-by');
     app.set('trust proxy', 1);
     // app.use(helmet());
-    const corsOptions = {
-        origin: true,
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: [
-            'Authorization',
-            'authorization',
-            'Content-Type',
-            'content-type',
-            'Origin',
-            'Accept',
-            'X-Requested-With',
-            'Access-Control-Allow-Headers',
-            'Access-Control-Request-Method',
-            'Access-Control-Request-Headers'
-        ],
-        optionsSuccessStatus: 200
-    };
-    app.use((0, cors_1.default)(corsOptions));
+    // Explicit CORS Middleware to ensure preflights & Authorization header are always allowed
+    app.use((req, res, next) => {
+        const origin = req.headers.origin;
+        if (origin) {
+            res.setHeader('Access-Control-Allow-Origin', origin);
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
+        }
+        else {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+        }
+        res.setHeader('Access-Control-Allow-Headers', 'Authorization, authorization, Content-Type, content-type, Origin, Accept, X-Requested-With, Access-Control-Request-Headers, Access-Control-Request-Method');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+        if (req.method === 'OPTIONS') {
+            res.sendStatus(200);
+            return;
+        }
+        next();
+    });
     app.use(express_1.default.json({ limit: '1mb' }));
     app.use(express_1.default.urlencoded({ extended: true }));
     // Log all incoming requests with full details to stderr (so cPanel logs it)

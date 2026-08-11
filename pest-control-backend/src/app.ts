@@ -14,26 +14,30 @@ export const createApp = () => {
   app.set('trust proxy', 1);
 
   // app.use(helmet());
-  const corsOptions: cors.CorsOptions = {
-    origin: true,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'Authorization',
-      'authorization',
-      'Content-Type',
-      'content-type',
-      'Origin',
-      'Accept',
-      'X-Requested-With',
+  // Explicit CORS Middleware to ensure preflights & Authorization header are always allowed
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    res.setHeader(
       'Access-Control-Allow-Headers',
-      'Access-Control-Request-Method',
-      'Access-Control-Request-Headers'
-    ],
-    optionsSuccessStatus: 200
-  };
+      'Authorization, authorization, Content-Type, content-type, Origin, Accept, X-Requested-With, Access-Control-Request-Headers, Access-Control-Request-Method'
+    );
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+    );
 
-  app.use(cors(corsOptions));
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(200);
+      return;
+    }
+    next();
+  });
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true }));
 

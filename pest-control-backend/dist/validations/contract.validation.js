@@ -13,6 +13,7 @@ const addressSchema = zod_1.z.object({
 exports.createContractSchema = zod_1.z.object({
     body: zod_1.z.object({
         title: zod_1.z.string().min(1),
+        contractDate: zod_1.z.string().optional(),
         aliasName: zod_1.z.string().min(1),
         trnNumber: zod_1.z.string().min(1),
         email: zod_1.z.string().email(),

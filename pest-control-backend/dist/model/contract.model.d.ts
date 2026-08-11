@@ -55,6 +55,7 @@ export interface JobType {
 }
 export interface ContractDocument extends Document {
     contractNumber: string;
+    contractDate?: Date;
     title: string;
     aliasName: string;
     trnNumber: string;

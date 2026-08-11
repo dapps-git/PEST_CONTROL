@@ -119,6 +119,10 @@ const contractSchema = new mongoose_1.Schema({
         unique: true,
         immutable: true,
     },
+    contractDate: {
+        type: Date,
+        default: Date.now,
+    },
     title: { type: String },
     aliasName: { type: String },
     trnNumber: { type: String },
