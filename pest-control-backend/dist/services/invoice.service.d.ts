@@ -4,11 +4,7 @@ export declare class InvoiceService {
     }> & {
         __v: number;
     })[]>;
-    list(filters?: any): Promise<(import("mongoose").Document<unknown, {}, import("../model/invoice.model").InvoiceDocument, {}, import("mongoose").DefaultSchemaOptions> & import("../model/invoice.model").InvoiceDocument & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }> & {
-        __v: number;
-    })[]>;
+    list(filters?: any): Promise<any[]>;
     getByScheduledDate(contractId: string, jobId: string, scheduledDate: string): Promise<(import("mongoose").Document<unknown, {}, import("../model/invoice.model").InvoiceDocument, {}, import("mongoose").DefaultSchemaOptions> & import("../model/invoice.model").InvoiceDocument & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {

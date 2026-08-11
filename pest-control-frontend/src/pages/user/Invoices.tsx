@@ -55,12 +55,16 @@ export default function Invoices() {
             setShowSuggestions(false);
         }
 
-        dispatch(fetchContracts({ page: 1, limit: 10, search: searchTerm }));
-    }, [dispatch, searchTerm]);
+        if (activeTab === 'projected') {
+            dispatch(fetchContracts({ page: 1, limit: 10, search: searchTerm }));
+        } else {
+            dispatch(fetchInvoices({ search: searchTerm }));
+        }
+    }, [dispatch, searchTerm, activeTab]);
 
     useEffect(() => {
         if (activeTab === 'collected') {
-            dispatch(fetchInvoices({}));
+            dispatch(fetchInvoices({ search: searchTerm }));
         }
     }, [dispatch, activeTab]);
 
@@ -430,7 +434,24 @@ export default function Invoices() {
                                 </div>
                             ) : (
                                 <div className="grid gap-6">
-                                    {collectedInvoices.map((invoice: any) => (
+                                    {collectedInvoices.map((invoice: any) => {
+                                        const foundContract = contracts.find(
+                                            (c) =>
+                                                c._id === (typeof invoice.contractId === "object" ? invoice.contractId?._id : invoice.contractId) ||
+                                                (invoice.contractNumber && c.contractNumber === invoice.contractNumber)
+                                        );
+                                        const clientName =
+                                            (invoice.clientName && invoice.clientName !== "Business Client" ? invoice.clientName : null) ||
+                                            (typeof invoice.contractId === "object" ? invoice.contractId?.title : null) ||
+                                            foundContract?.title ||
+                                            "Client Invoice";
+                                        const contractNum =
+                                            invoice.contractNumber ||
+                                            (typeof invoice.contractId === "object" ? invoice.contractId?.contractNumber : "") ||
+                                            foundContract?.contractNumber ||
+                                            "";
+
+                                        return (
                                         <div key={invoice._id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all">
                                             <div className="p-6">
                                                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
@@ -439,10 +460,19 @@ export default function Invoices() {
                                                             <CheckCircle2 className="w-6 h-6" />
                                                         </div>
                                                         <div>
-                                                            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                                                Invoice #{invoice._id.slice(-6).toUpperCase()}
+                                                            <h3 className="text-lg font-bold text-slate-900">
+                                                                {clientName}
                                                             </h3>
-                                                            <p className="text-slate-500 text-sm mt-1 font-medium">{invoice.contractNumber}</p>
+                                                            <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                                                {contractNum && (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                                                        {contractNum}
+                                                                    </span>
+                                                                )}
+                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                                                    Invoice #{invoice._id.slice(-6).toUpperCase()}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="text-left md:text-right">
@@ -480,9 +510,10 @@ export default function Invoices() {
                                                         ))}
                                                     </div>
                                                 </div>
-                                            </div>
+                                             </div>
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
