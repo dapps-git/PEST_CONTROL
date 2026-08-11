@@ -2,8 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvoiceService = void 0;
 const invoice_model_1 = require("../model/invoice.model");
+const contract_model_1 = require("../model/contract.model");
 class InvoiceService {
     async create(data) {
+        if ((!data.clientName || !data.contractNumber) && data.contractId) {
+            const contract = await contract_model_1.Contract.findById(data.contractId);
+            if (contract) {
+                if (!data.clientName)
+                    data.clientName = contract.title;
+                if (!data.contractNumber)
+                    data.contractNumber = contract.contractNumber;
+            }
+        }
         const invoice = await invoice_model_1.Invoice.create(data);
         return invoice;
     }
@@ -27,9 +37,18 @@ class InvoiceService {
                 { "items.description": { $regex: search, $options: "i" } }
             ];
         }
-        return await invoice_model_1.Invoice.find(query)
+        const invoices = await invoice_model_1.Invoice.find(query)
             .populate("contractId", "title contractNumber email phone")
-            .sort({ collectionDate: -1 });
+            .sort({ collectionDate: -1 })
+            .lean();
+        return invoices.map((inv) => {
+            const contract = inv.contractId && typeof inv.contractId === "object" ? inv.contractId : null;
+            return {
+                ...inv,
+                clientName: inv.clientName || contract?.title || "Client Invoice",
+                contractNumber: inv.contractNumber || contract?.contractNumber || ""
+            };
+        });
     }
     async getByScheduledDate(contractId, jobId, scheduledDate) {
         const start = new Date(scheduledDate);
