@@ -69,6 +69,7 @@ export default function CollectInvoice() {
                 contractId,
                 jobId,
                 contractNumber: contract?.contractNumber,
+                clientName: contract?.title,
                 scheduledDate: new Date(scheduledDate).toISOString(),
                 collectionDate: new Date(formData.collectionDate).toISOString(),
                 items: formData.items,

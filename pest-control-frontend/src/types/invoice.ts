@@ -7,9 +7,10 @@ export interface InvoiceItem {
 
 export interface InvoiceCollection {
     _id: string;
-    contractId: string;
+    contractId: string | { _id: string; title: string; contractNumber: string; email?: string; phone?: string };
     jobId: string;
     contractNumber?: string;
+    clientName?: string;
 
     scheduledDate: string;
     collectionDate: string;

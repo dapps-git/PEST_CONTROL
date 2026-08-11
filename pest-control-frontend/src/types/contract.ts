@@ -23,6 +23,7 @@ export interface Contract {
   remarks: string;
   createdAt?: string;
   updatedAt?: string;
+  contractDate?: string;
   contractNumber: string;
 }
 

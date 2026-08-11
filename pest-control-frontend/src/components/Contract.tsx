@@ -10,7 +10,8 @@ import {
   AlertCircle,
   Loader2,
   X,
-  FileText
+  FileText,
+  Calendar
 } from "lucide-react";
 import { AddContractModal } from "./modal/AddContractModal";
 import { Pagination } from "./common/Pagination";
@@ -61,10 +62,35 @@ export const Contracts = () => {
     );
   }, [dispatch, currentPage, searchTerm]);
 
+  const formatDateDisplay = (dateVal?: string | Date) => {
+    if (!dateVal) return "N/A";
+    const str = typeof dateVal === "string" ? dateVal : dateVal.toISOString();
+    const cleanDateStr = str.split("T")[0];
+    const parts = cleanDateStr.split("-");
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        return new Date(year, month, day).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      }
+    }
+    return new Date(dateVal).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   // Handle create contract
   const handleAddContract = async (formData: any) => {
     try {
       await dispatch(createContract(formData)).unwrap();
+      dispatch(fetchContracts({ page: currentPage, limit: 5, search: searchTerm }));
       setShowAddModal(false);
     } catch (err) {
       console.error("Failed to create contract:", err);
@@ -80,6 +106,7 @@ export const Contracts = () => {
           formData,
         })
       ).unwrap();
+      dispatch(fetchContracts({ page: currentPage, limit: 5, search: searchTerm }));
       setShowEditModal(false);
       setSelectedContract(null);
     } catch (err) {
@@ -263,6 +290,12 @@ export const Contracts = () => {
                     {/* Card Details */}
                     <div className="space-y-2 mb-4 bg-slate-50/50 rounded-lg p-3 border border-slate-100">
                       <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <span className="font-medium text-slate-400 text-xs w-14">Date</span>
+                        <span className="text-slate-700 font-medium">
+                          {formatDateDisplay(contract.contractDate || contract.createdAt)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
                         <span className="font-medium text-slate-400 text-xs w-14">Email</span>
                         <span className="text-slate-700 truncate flex-1">{contract.email}</span>
                       </div>
@@ -308,6 +341,7 @@ export const Contracts = () => {
                       <tr>
                         <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Contract ID</th>
                         <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Client / Title</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
                         <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact Info</th>
                         <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
                         <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
@@ -330,6 +364,14 @@ export const Contracts = () => {
                                 <div className="text-sm font-semibold text-slate-900">{contract.title}</div>
                                 <div className="text-xs text-slate-500">Business Client</div>
                               </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-1.5 text-sm text-slate-700 font-medium">
+                              <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+                              <span>
+                                {formatDateDisplay(contract.contractDate || contract.createdAt)}
+                              </span>
                             </div>
                           </td>
                           <td className="px-6 py-4">

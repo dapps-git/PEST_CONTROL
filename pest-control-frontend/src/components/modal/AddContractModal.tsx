@@ -14,26 +14,36 @@ export const AddContractModal = ({
   isEdit?: boolean;
 }) => {
   const [formData, setFormData] = useState(
-    initialData || {
-      title: "",
-      aliasName: "",
-      trnNumber: "",
-      email: "",
-      phone: "",
-      mobile: "",
-      address: {
-        street1: "",
-        street2: "",
-        city: "",
-        poBox: "",
-        emirate: "",
-        country: "",
-      },
-      referredByEmployee: "",
-      quoteValidityDays: "",
-      creditLimit: "",
-      remarks: "",
-    }
+    initialData
+      ? {
+          ...initialData,
+          contractDate: initialData.contractDate
+            ? new Date(initialData.contractDate).toISOString().split("T")[0]
+            : initialData.createdAt
+            ? new Date(initialData.createdAt).toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0],
+        }
+      : {
+          title: "",
+          contractDate: new Date().toISOString().split("T")[0],
+          aliasName: "",
+          trnNumber: "",
+          email: "",
+          phone: "",
+          mobile: "",
+          address: {
+            street1: "",
+            street2: "",
+            city: "",
+            poBox: "",
+            emirate: "",
+            country: "",
+          },
+          referredByEmployee: "",
+          quoteValidityDays: "",
+          creditLimit: "",
+          remarks: "",
+        }
   );
 
   const emirates = [
@@ -151,6 +161,14 @@ export const AddContractModal = ({
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="e.g. Al Futtaim Group"
+                  required
+                />
+                <InputField
+                  label="Contract Date"
+                  type="date"
+                  name="contractDate"
+                  value={formData.contractDate || ""}
+                  onChange={handleChange}
                   required
                 />
                 <InputField
