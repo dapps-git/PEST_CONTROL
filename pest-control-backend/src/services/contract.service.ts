@@ -3,6 +3,9 @@ import { AppError } from "../utils/AppError";
 
 export class ContractService {
   async create(data: any) {
+    if (data.contractDate) {
+      data.contractDate = new Date(data.contractDate);
+    }
     return await Contract.create(data);
   }
 
@@ -57,7 +60,19 @@ export class ContractService {
   }
 
   async update(id: string, data: any) {
-    const updated = await Contract.findByIdAndUpdate(id, data, {
+    const updateData = { ...data };
+    delete updateData._id;
+    delete updateData.contractNumber;
+    delete updateData.createdAt;
+    delete updateData.updatedAt;
+    delete updateData.__v;
+    delete updateData.jobs;
+
+    if (updateData.contractDate) {
+      updateData.contractDate = new Date(updateData.contractDate);
+    }
+
+    const updated = await Contract.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });

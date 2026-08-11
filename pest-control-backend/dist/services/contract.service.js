@@ -5,6 +5,9 @@ const contract_model_1 = require("../model/contract.model");
 const AppError_1 = require("../utils/AppError");
 class ContractService {
     async create(data) {
+        if (data.contractDate) {
+            data.contractDate = new Date(data.contractDate);
+        }
         return await contract_model_1.Contract.create(data);
     }
     async list({ page = 1, limit = 10, search = "", startDate = null, endDate = null }) {
@@ -51,7 +54,17 @@ class ContractService {
         return doc;
     }
     async update(id, data) {
-        const updated = await contract_model_1.Contract.findByIdAndUpdate(id, data, {
+        const updateData = { ...data };
+        delete updateData._id;
+        delete updateData.contractNumber;
+        delete updateData.createdAt;
+        delete updateData.updatedAt;
+        delete updateData.__v;
+        delete updateData.jobs;
+        if (updateData.contractDate) {
+            updateData.contractDate = new Date(updateData.contractDate);
+        }
+        const updated = await contract_model_1.Contract.findByIdAndUpdate(id, updateData, {
             new: true,
             runValidators: true,
         });
