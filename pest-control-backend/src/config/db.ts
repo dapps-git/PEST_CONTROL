@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import logger from "./logger";
 import { AdminModel } from "../model/admin.model";
@@ -7,12 +8,26 @@ let retryCount = 0;
 
 const seedAdmin = async () => {
   try {
-    const adminCount = await AdminModel.countDocuments();
-    if (adminCount === 0) {
-      const email = process.env.ADMIN_EMAIL || "admin@pestcontrol.com";
-      const passwordHash = process.env.ADMIN_PASSWORD_HASH || "$2b$10$qev1Em8wdlmuFX7HehltD.S74ewl1beKJnc/REQcQAexegcnDSNo2";
-      await AdminModel.create({ email, passwordHash });
+    const email = (process.env.ADMIN_EMAIL || "admin@pestcontrol.com").toLowerCase();
+    const defaultPasswordHash = "$2b$10$fgO5h0kgjWSt59JIQP5JtO9aIYwErSYGHJ2Us1aLM5rY8KBDkxBiS"; // default: admin123
+    const plainPassword = process.env.ADMIN_PASSWORD || "admin123";
+    
+    let passwordHash = process.env.ADMIN_PASSWORD_HASH || defaultPasswordHash;
+    if (process.env.ADMIN_PASSWORD) {
+      passwordHash = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
+    }
+
+    let admin = await AdminModel.findOne({ email });
+    if (!admin) {
+      admin = await AdminModel.create({ email, passwordHash });
       logger.info(`✅ Admin user seeded in database: ${email}`);
+    } else {
+      const isMatch = await bcrypt.compare(plainPassword, admin.passwordHash);
+      if (!isMatch && (process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD_HASH)) {
+        admin.passwordHash = passwordHash;
+        await admin.save();
+        logger.info(`✅ Admin password updated for: ${email}`);
+      }
     }
   } catch (error) {
     logger.error(error as Error, "Failed to seed admin user");

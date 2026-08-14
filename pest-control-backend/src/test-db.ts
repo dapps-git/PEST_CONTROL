@@ -4,7 +4,7 @@ import path from "path";
 
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
-const uri = process.env.MONGO_URI || "mongodb+srv://dappstech2025_db_user:dapps1234@cluster0.ecrnbjn.mongodb.net/PEST?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.MONGO_URI || "mongodb+srv://mohhammedmanzoor_db_user:8wBB76eDiGtQiEdt@cluster0.webb3i8.mongodb.net/PEST?retryWrites=true&w=majority&appName=Cluster0";
 
 console.log("Attempting to connect to MongoDB...");
 console.log("URI:", uri.replace(/:([^@]+)@/, ":****@")); // Mask password
