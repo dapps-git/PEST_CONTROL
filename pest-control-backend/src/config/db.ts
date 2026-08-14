@@ -9,8 +9,8 @@ let retryCount = 0;
 const seedAdmin = async () => {
   try {
     const email = (process.env.ADMIN_EMAIL || "admin@pestcontrol.com").toLowerCase();
-    const defaultPasswordHash = "$2b$10$fgO5h0kgjWSt59JIQP5JtO9aIYwErSYGHJ2Us1aLM5rY8KBDkxBiS"; // default: admin123
-    const plainPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const defaultPasswordHash = "$2b$10$cgwqgapy4Z/8hUGuWCfc9uFuygmQrcdLsq8D/HTYqG2RxdDttWf7y"; // default: admin@123
+    const plainPassword = process.env.ADMIN_PASSWORD || "admin@123";
     
     let passwordHash = process.env.ADMIN_PASSWORD_HASH || defaultPasswordHash;
     if (process.env.ADMIN_PASSWORD) {
