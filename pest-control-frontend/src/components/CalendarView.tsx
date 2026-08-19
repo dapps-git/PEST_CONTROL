@@ -366,30 +366,40 @@ export const CalendarView = () => {
                             safetyCounter++;
 
                             if (currentInvoiceDate >= viewStart && currentInvoiceDate <= viewEnd) {
-                                const isCollected = collectedInvoices.some((inv: any) =>
-                                    inv.contractId === contract._id &&
-                                    inv.jobId === job._id &&
-                                    new Date(inv.scheduledDate).toDateString() === currentInvoiceDate.toDateString()
-                                );
+                                const isCollected = collectedInvoices.some((inv: any) => {
+                                    const invContractId = typeof inv.contractId === "object" ? inv.contractId?._id : inv.contractId;
+                                    const invJobId = typeof inv.jobId === "object" ? inv.jobId?._id : inv.jobId;
+                                    const invDate = new Date(inv.scheduledDate);
+                                    return (
+                                        String(invContractId) === String(contract._id) &&
+                                        String(invJobId) === String(job._id) &&
+                                        invDate.getFullYear() === currentInvoiceDate.getFullYear() &&
+                                        invDate.getMonth() === currentInvoiceDate.getMonth() &&
+                                        invDate.getDate() === currentInvoiceDate.getDate()
+                                    );
+                                });
 
-                                if (statusFilter === 'all' || statusFilter === 'invoice') {
-                                    calendarEvents.push({
-                                        id: `${contract._id}-${job._id}-invoice-${currentInvoiceDate.getTime()}`,
-                                        title: `${contract.title} - Invoice${isCollected ? ' (Collected)' : ''}`,
-                                        start: new Date(currentInvoiceDate),
-                                        end: new Date(currentInvoiceDate),
-                                        type: 'invoice',
-                                        status: isCollected ? 'collected' : 'pending',
-                                        resource: {
-                                            job,
-                                            contractId: contract._id,
-                                            contractTitle: contract.title,
-                                            contractNumber: contract.contractNumber,
-                                            email: contract.email,
-                                            phone: contract.phone,
-                                            address: `${contract.address.city}, ${contract.address.emirate}`,
-                                        },
-                                    });
+                                // Once added to invoice (collected), vanish from calendar
+                                if (!isCollected) {
+                                    if (statusFilter === 'all' || statusFilter === 'invoice') {
+                                        calendarEvents.push({
+                                            id: `${contract._id}-${job._id}-invoice-${currentInvoiceDate.getTime()}`,
+                                            title: `${contract.title} - Invoice`,
+                                            start: new Date(currentInvoiceDate),
+                                            end: new Date(currentInvoiceDate),
+                                            type: 'invoice',
+                                            status: 'pending',
+                                            resource: {
+                                                job,
+                                                contractId: contract._id,
+                                                contractTitle: contract.title,
+                                                contractNumber: contract.contractNumber,
+                                                email: contract.email,
+                                                phone: contract.phone,
+                                                address: `${contract.address.city}, ${contract.address.emirate}`,
+                                            },
+                                        });
+                                    }
                                 }
                             }
 
