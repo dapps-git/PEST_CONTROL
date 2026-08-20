@@ -949,7 +949,7 @@ export const CalendarView = () => {
                     events={events}
                     startAccessor="start"
                     endAccessor="end"
-                    style={{ height: 750 }}
+                    style={{ minHeight: 750 }}
                     view={view}
                     onView={handleViewChange}
                     date={date}
@@ -961,7 +961,8 @@ export const CalendarView = () => {
                         toolbar: CustomToolbar,
                         event: CustomEventComponent,
                     }}
-                    popup
+                    showAllEvents={true}
+                    doShowMoreDrillDown={false}
                     selectable
                     resizable
                 />

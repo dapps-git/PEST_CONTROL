@@ -17,19 +17,49 @@
   border-left: none !important;
 }
 
-/* Month View Grid */
+/* Month View Grid - Dynamic vertical expansion when contracts are more */
 .rbc-month-view {
+  display: flex !important;
+  flex-direction: column !important;
   border: 1px solid #f1f5f9;
   border-radius: 0 0 16px 16px;
+  min-height: 750px;
+  height: auto !important;
+  overflow: visible !important;
 }
 
 .rbc-month-row {
+  display: flex !important;
+  flex: 1 0 auto !important;
+  flex-basis: auto !important;
   border-top: 1px solid #f1f5f9;
-  min-height: 120px; /* Taller cells */
+  min-height: 120px; /* Base height for empty cells */
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.rbc-row-content {
+  position: relative !important;
+  z-index: 4;
+  height: auto !important;
+  min-height: 100%;
+}
+
+.rbc-row-bg {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100% !important;
+  z-index: 1;
 }
 
 .rbc-day-bg {
   border-left: 1px solid #f8fafc; /* Very subtle vertical lines */
+  height: 100% !important;
 }
 
 .rbc-off-range-bg {
@@ -74,20 +104,9 @@
   font-weight: 600;
 }
 
-/* Show More Link */
+/* Hide Show More Link as all events are displayed */
 .rbc-show-more {
-  background-color: white;
-  color: #64748b;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-top: 2px;
-}
-
-.rbc-show-more:hover {
-  color: #4f46e5;
-  text-decoration: none;
+  display: none !important;
 }
 
 /* Time Views (Week/Day) */
