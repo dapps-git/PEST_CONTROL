@@ -43,12 +43,13 @@ export default function JobModal({
       instructions: string;
       units: number | string;
       rate: number | string;
-      subtotalPerYear: number;
+      subtotalPerYear: number | string;
       frequencyDays: number | string;
       frequencyUnit: "day" | "week" | "month" | "year" | "custom";
       isEvery: boolean;
       customFrequencyValue?: number | string;
       customFrequencyUnit?: "day" | "week" | "month" | "year";
+      lastEditedMode?: "rate" | "subtotal";
     }>;
   }>({
     jobType: "recurring",
@@ -78,6 +79,7 @@ export default function JobModal({
         isEvery: false,
         customFrequencyValue: 1,
         customFrequencyUnit: "day",
+        lastEditedMode: "rate",
       },
     ],
   });
@@ -110,7 +112,7 @@ export default function JobModal({
     { value: "custom", label: "Custom" },
   ];
 
-  // --- EFFECTS & LOGIC (Unchanged) ---
+  // --- EFFECTS & LOGIC ---
   useEffect(() => {
     if (mode === "edit" && job) {
       setFormData({
@@ -131,9 +133,11 @@ export default function JobModal({
         },
         servicesProducts: job.servicesProducts.map(s => ({
           ...s,
+          subtotalPerYear: s.subtotalPerYear ?? 0,
           frequencyUnit: s.frequencyUnit || "month",
           customFrequencyValue: s.customFrequencyValue ?? 1,
           customFrequencyUnit: s.customFrequencyUnit ?? "day",
+          lastEditedMode: "rate" as const,
         })),
       });
     } else if (mode === "create") {
@@ -165,15 +169,53 @@ export default function JobModal({
             isEvery: false,
             customFrequencyValue: 1,
             customFrequencyUnit: "day",
+            lastEditedMode: "rate",
           },
         ],
       });
     }
   }, [mode, job]);
 
+  const getOccurrencesPerYear = (service: any): number => {
+    let occurrencesPerYear = 12;
+
+    if (service.frequencyUnit === "custom") {
+      const customFreq = Number(service.customFrequencyValue) || 1;
+      const customUnit = service.customFrequencyUnit || "day";
+      if (service.isEvery) {
+        if (customUnit === "day") occurrencesPerYear = 365 / customFreq;
+        else if (customUnit === "week") occurrencesPerYear = 52 / customFreq;
+        else if (customUnit === "month") occurrencesPerYear = 12 / customFreq;
+        else occurrencesPerYear = 1 / customFreq;
+      } else {
+        if (customUnit === "day") occurrencesPerYear = customFreq * 365;
+        else if (customUnit === "week") occurrencesPerYear = customFreq * 52;
+        else if (customUnit === "month") occurrencesPerYear = customFreq * 12;
+        else occurrencesPerYear = customFreq * 1;
+      }
+    } else {
+      const freq = Number(service.frequencyDays) || 1;
+      if (service.isEvery) {
+        if (service.frequencyUnit === "day") occurrencesPerYear = 365 / freq;
+        else if (service.frequencyUnit === "week") occurrencesPerYear = 52 / freq;
+        else if (service.frequencyUnit === "month") occurrencesPerYear = 12 / freq;
+        else if (service.frequencyUnit === "year") occurrencesPerYear = 1 / freq;
+        else occurrencesPerYear = 12 / freq;
+      } else {
+        if (service.frequencyUnit === "day") occurrencesPerYear = freq * 365;
+        else if (service.frequencyUnit === "week") occurrencesPerYear = freq * 52;
+        else if (service.frequencyUnit === "month") occurrencesPerYear = freq * 12;
+        else if (service.frequencyUnit === "year") occurrencesPerYear = freq * 1;
+        else occurrencesPerYear = freq * 12;
+      }
+    }
+
+    return occurrencesPerYear > 0 ? occurrencesPerYear : 1;
+  };
+
   const calculateTotals = () => {
     const subtotal = formData.servicesProducts.reduce(
-      (sum, service) => sum + service.subtotalPerYear,
+      (sum, service) => sum + (Number(service.subtotalPerYear) || 0),
       0
     );
     const vat = formData.isTaxExempt ? 0 : subtotal * 0.05;
@@ -185,49 +227,69 @@ export default function JobModal({
 
   const updateService = (index: number, field: string, value: any) => {
     const updated = [...formData.servicesProducts];
-    updated[index] = { ...updated[index], [field]: value };
+    const currentService = { ...updated[index], [field]: value };
 
-    if (field === "units" || field === "rate" || field === "frequencyDays" || field === "frequencyUnit" || field === "isEvery" || field === "customFrequencyValue" || field === "customFrequencyUnit") {
-      const service = updated[index];
-      const units = Number(service.units) || 0;
-      const rate = Number(service.rate) || 0;
+    if (field === "subtotalPerYear") {
+      currentService.lastEditedMode = "subtotal";
+      const subtotalVal = value === "" ? "" : Number(value);
+      currentService.subtotalPerYear = subtotalVal;
 
-      let occurrencesPerYear;
+      const subtotalNum = Number(subtotalVal) || 0;
+      const unitsNum = Number(currentService.units) || 1;
+      const occurrences = getOccurrencesPerYear(currentService);
 
-      if (service.frequencyUnit === "custom") {
-        const customFreq = Number(service.customFrequencyValue) || 1;
-        const customUnit = service.customFrequencyUnit || "day";
-        if (service.isEvery) {
-          if (customUnit === "day") occurrencesPerYear = 365 / customFreq;
-          else if (customUnit === "week") occurrencesPerYear = 52 / customFreq;
-          else if (customUnit === "month") occurrencesPerYear = 12 / customFreq;
-          else occurrencesPerYear = 1 / customFreq;
-        } else {
-          if (customUnit === "day") occurrencesPerYear = customFreq * 365;
-          else if (customUnit === "week") occurrencesPerYear = customFreq * 52;
-          else if (customUnit === "month") occurrencesPerYear = customFreq * 12;
-          else occurrencesPerYear = customFreq * 1;
+      if (unitsNum * occurrences > 0 && subtotalVal !== "") {
+        const calculatedRate = subtotalNum / (unitsNum * occurrences);
+        currentService.rate = Number(calculatedRate.toFixed(2));
+      }
+    } else if (field === "rate") {
+      currentService.lastEditedMode = "rate";
+      const rateVal = value === "" ? "" : Number(value);
+      currentService.rate = rateVal;
+
+      const rateNum = Number(rateVal) || 0;
+      const unitsNum = Number(currentService.units) || 0;
+      const occurrences = getOccurrencesPerYear(currentService);
+
+      currentService.subtotalPerYear = Number((unitsNum * rateNum * occurrences).toFixed(2));
+    } else if (field === "units") {
+      const unitsVal = value === "" ? "" : Number(value);
+      currentService.units = unitsVal;
+      const unitsNum = Number(unitsVal) || 0;
+      const occurrences = getOccurrencesPerYear(currentService);
+
+      if (currentService.lastEditedMode === "subtotal") {
+        const subtotalNum = Number(currentService.subtotalPerYear) || 0;
+        if (unitsNum * occurrences > 0) {
+          currentService.rate = Number((subtotalNum / (unitsNum * occurrences)).toFixed(2));
         }
       } else {
-        const freq = Number(service.frequencyDays) || 1;
-        if (service.isEvery) {
-          if (service.frequencyUnit === "day") occurrencesPerYear = 365 / freq;
-          else if (service.frequencyUnit === "week") occurrencesPerYear = 52 / freq;
-          else if (service.frequencyUnit === "month") occurrencesPerYear = 12 / freq;
-          else if (service.frequencyUnit === "year") occurrencesPerYear = 1 / freq;
-          else occurrencesPerYear = 12 / freq;
-        } else {
-          if (service.frequencyUnit === "day") occurrencesPerYear = freq * 365;
-          else if (service.frequencyUnit === "week") occurrencesPerYear = freq * 52;
-          else if (service.frequencyUnit === "month") occurrencesPerYear = freq * 12;
-          else if (service.frequencyUnit === "year") occurrencesPerYear = freq * 1;
-          else occurrencesPerYear = freq * 12;
-        }
+        const rateNum = Number(currentService.rate) || 0;
+        currentService.subtotalPerYear = Number((unitsNum * rateNum * occurrences).toFixed(2));
       }
+    } else if (
+      field === "frequencyDays" ||
+      field === "frequencyUnit" ||
+      field === "isEvery" ||
+      field === "customFrequencyValue" ||
+      field === "customFrequencyUnit"
+    ) {
+      const occurrences = getOccurrencesPerYear(currentService);
 
-      updated[index].subtotalPerYear = units * rate * occurrencesPerYear;
+      if (currentService.lastEditedMode === "subtotal") {
+        const subtotalNum = Number(currentService.subtotalPerYear) || 0;
+        const unitsNum = Number(currentService.units) || 1;
+        if (unitsNum * occurrences > 0) {
+          currentService.rate = Number((subtotalNum / (unitsNum * occurrences)).toFixed(2));
+        }
+      } else {
+        const rateNum = Number(currentService.rate) || 0;
+        const unitsVal = Number(currentService.units) || 0;
+        currentService.subtotalPerYear = Number((unitsVal * rateNum * occurrences).toFixed(2));
+      }
     }
 
+    updated[index] = currentService;
     setFormData({ ...formData, servicesProducts: updated });
   };
 
@@ -247,6 +309,7 @@ export default function JobModal({
           isEvery: false,
           customFrequencyValue: 1,
           customFrequencyUnit: "day",
+          lastEditedMode: "rate",
         },
       ],
     });
@@ -271,11 +334,14 @@ export default function JobModal({
           customFrequencyValue: Number(formData.invoiceReminder.customFrequencyValue),
         },
         servicesProducts: formData.servicesProducts.map((s) => ({
-          ...s,
+          serviceType: s.serviceType,
+          instructions: s.instructions,
           units: Number(s.units) || 0,
           rate: Number(s.rate) || 0,
+          subtotalPerYear: Number(s.subtotalPerYear) || 0,
           frequencyDays: Number(s.frequencyDays) || 1,
           frequencyUnit: s.frequencyUnit || "month",
+          isEvery: Boolean(s.isEvery),
           customFrequencyValue: Number(s.customFrequencyValue) || 1,
           customFrequencyUnit: s.customFrequencyUnit || "day",
         })),
@@ -632,9 +698,31 @@ export default function JobModal({
                           </div>
                         </div>
 
-                        <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
-                          <span className="text-xs font-semibold text-slate-500 uppercase">Subtotal (Year)</span>
-                          <span className="text-sm font-bold text-slate-900">AED {service.subtotalPerYear.toFixed(2)}</span>
+                        <div className="pt-3 border-t border-slate-200 space-y-1.5">
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                Subtotal (Year)
+                              </label>
+                              <span className="text-[10px] text-slate-400 font-normal">
+                                {service.lastEditedMode === "subtotal" ? "Manual input (calculates rate)" : "Auto-calculated"}
+                              </span>
+                            </div>
+                            <div className="relative w-44">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                                AED
+                              </span>
+                              <input
+                                type="number"
+                                value={service.subtotalPerYear}
+                                onChange={(e: any) => updateService(index, "subtotalPerYear", e.target.value)}
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                className="w-full pl-11 pr-3 py-2 bg-white border border-indigo-200 rounded-xl text-slate-900 text-sm font-bold text-right focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
